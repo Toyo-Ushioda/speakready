@@ -656,8 +656,9 @@ function compareTexts(target, spoken, confidence, alternatives) {
     }
 
     // Check alternative-based confidence penalty (strict: triggers at 30% disagreement)
+    // Skip for very short inputs (1-2 words) — alternatives are too noisy
     let wordConfidence = 1.0;
-    if (found && altWordSets.length > 0) {
+    if (found && altWordSets.length > 0 && targetWords.length > 2) {
       let missingCount = 0;
       for (const altSet of altWordSets) {
         if (!altSet.has(twAlpha)) missingCount++;
@@ -719,20 +720,21 @@ function compareTexts(target, spoken, confidence, alternatives) {
   const rawConfidence = confidence > 0 ? confidence : 0.5;
   const confidenceScore = Math.pow(rawConfidence, 1.5) * 100;
 
-  // Dynamic weighting: heavier confidence weight = pronunciation quality matters more
+  // Dynamic weighting: short inputs rely on word accuracy (API confidence is unreliable),
+  // longer sentences rely heavily on pronunciation confidence
   const wordCount = targetWords.length;
   let wordWeight, confWeight;
   if (wordCount <= 2) {
-    wordWeight = 0.6;
-    confWeight = 0.4;
+    wordWeight = 0.85;
+    confWeight = 0.15;
   } else if (wordCount >= 6) {
     wordWeight = 0.2;
     confWeight = 0.8;
   } else {
-    // Linear interpolation: 2 words → 0.6/0.4, 6 words → 0.2/0.8
+    // Linear interpolation: 2 words → 0.85/0.15, 6 words → 0.2/0.8
     const t = (wordCount - 2) / 4;
-    wordWeight = 0.6 - t * 0.4;
-    confWeight = 0.4 + t * 0.4;
+    wordWeight = 0.85 - t * 0.65;
+    confWeight = 0.15 + t * 0.65;
   }
 
   const rawScore = recallScore * wordWeight + confidenceScore * confWeight - extraPenalty;
