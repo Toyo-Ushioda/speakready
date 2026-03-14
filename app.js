@@ -99,32 +99,16 @@ document.addEventListener('DOMContentLoaded', () => {
     welcomeScreen.classList.add('hidden');
     welcomeScreen.classList.remove('active');
   }
-  // Detect in-app browsers (X/Twitter, Facebook, Instagram, LINE, etc.)
-  const ua = navigator.userAgent;
-  const isInAppBrowser =
-    // Known app identifiers
-    /FBAN|FBAV|Twitter|Line\/|Instagram|Snapchat|Pinterest/i.test(ua)
-    // Android WebView
-    || (ua.includes('wv') && isMobile)
-    // iOS in-app browser: has iPhone/iPad but no "Safari" in UA
-    || (/iPhone|iPad|iPod/.test(ua) && !ua.includes('Safari'))
-    // Android in-app: has Android + Chrome but also has ";" before "Build" (WebView pattern)
-    || (/Android/.test(ua) && /Version\/[\d.]+/.test(ua) && ua.includes('Chrome'))
-    // Generic: no standalone browser identifier
-    || (isMobile && !navigator.standalone && window.matchMedia('(display-mode: browser)').matches === false && !ua.includes('Safari') && !ua.includes('Chrome'));
+  // In-app browser warning — shown when mic actually fails, not by UA detection
   const inappWarning = document.getElementById('inapp-warning');
   const inappCopy = document.getElementById('inapp-copy');
-
-  if (isInAppBrowser) {
-    inappWarning.classList.remove('hidden');
-    if (inappCopy) {
-      inappCopy.addEventListener('click', () => {
-        navigator.clipboard.writeText(window.location.href).then(() => {
-          inappCopy.textContent = 'コピーしました！';
-          setTimeout(() => { inappCopy.textContent = 'URLをコピー'; }, 2000);
-        });
+  if (inappCopy) {
+    inappCopy.addEventListener('click', () => {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        inappCopy.textContent = 'コピーしました！';
+        setTimeout(() => { inappCopy.textContent = 'URLをコピー'; }, 2000);
       });
-    }
+    });
   }
 
   // Check browser compatibility
@@ -368,9 +352,11 @@ function startRecognition() {
     switch (event.error) {
       case 'audio-capture':
         recordStatus.textContent = 'マイクが見つかりません。マイクを接続してください';
+        if (isMobile) inappWarning.classList.remove('hidden');
         break;
       case 'not-allowed':
-        recordStatus.textContent = 'マイクの使用が許可されていません。ブラウザの設定を確認してください';
+        recordStatus.textContent = 'マイクの使用が許可されていません';
+        if (isMobile) inappWarning.classList.remove('hidden');
         break;
       default:
         recordStatus.textContent = 'エラーが発生しました。もう一度お試しください';
@@ -417,11 +403,22 @@ function startRecognition() {
     // to avoid competing for mic access
     if (isMobile) {
       recordBtn.classList.add('pulse-recording');
+      // Timeout: if no speech detected after 5s, mic may be silently blocked
+      setTimeout(() => {
+        if (myGeneration === recognitionGeneration && isRecording && !lastTranscript && !resultProcessed) {
+          // Still recording but nothing heard — likely blocked
+          inappWarning.classList.remove('hidden');
+        }
+      }, 5000);
     } else {
       startAudioVisualizer();
     }
   } catch (e) {
-    recordStatus.textContent = 'マイクを起動できませんでした。ページを再読み込みしてください';
+    isRecording = false;
+    recordBtn.classList.remove('recording');
+    recordBtn.classList.remove('pulse-recording');
+    recordStatus.textContent = 'マイクを起動できませんでした';
+    if (isMobile) inappWarning.classList.remove('hidden');
   }
 }
 
