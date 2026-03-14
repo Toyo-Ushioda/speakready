@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpeakReady! | 英語発音トレーニング by WFE</title>
+  <meta name="description" content="Practice English pronunciation privately with instant feedback">
+  <meta name="theme-color" content="#4f46e5">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="icon" type="image/png" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./styles.css">
+
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-N1SFEF5X3H"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-N1SFEF5X3H');
+  </script>
+</head>
+<body>
+
+  <!-- Browser Compatibility Warning -->
+  <div id="compat-warning" class="compat-warning hidden">
+    <p>⚠️ このアプリはGoogle Chromeでの使用を推奨します。他のブラウザでは音声認識が動作しない場合があります。</p>
+    <button id="compat-dismiss" class="btn-text">閉じる</button>
+  </div>
+
+  <!-- Install Banner -->
+  <div id="install-banner" class="install-banner hidden">
+    <p>📱 ホーム画面に追加して、アプリとして使えます</p>
+    <div class="install-actions">
+      <button id="install-btn" class="btn-small btn-primary">追加する</button>
+      <button id="install-dismiss" class="btn-small btn-text">後で</button>
+    </div>
+  </div>
+
+  <!-- ========== REGISTRATION SCREEN ========== -->
+  <div id="register-screen" class="screen hidden">
+    <header class="app-header">
+      <img src="./icons/wfe-logo.png" alt="World Finance Edu" class="app-logo">
+      <h1 class="app-title">🎤 SpeakReady!</h1>
+      <p class="app-tagline">Practice English alone, until you're ready for the world.</p>
+    </header>
+    <main class="welcome-content">
+      <section class="card register-section">
+        <h2 class="register-heading">無料で始める</h2>
+        <p class="register-subtitle">メールアドレスを登録して、すぐに練習を始めましょう。</p>
+        <div class="register-form">
+          <input type="email" id="register-email" class="register-input" placeholder="メールアドレスを入力" required>
+          <button id="register-btn" class="btn-primary btn-large">登録して始める →</button>
+          <p id="register-error" class="register-error hidden">有効なメールアドレスを入力してください</p>
+        </div>
+        <div class="register-privacy">
+          <p>🔒 <strong>プライバシーについて</strong></p>
+          <ul>
+            <li>メールアドレスはアプリの利用状況の把握のみに使用します</li>
+            <li>第三者への提供・広告配信には一切使用しません</li>
+            <li>データはGoogleの安全なサーバーに保存されます</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ========== WELCOME SCREEN ========== -->
+  <div id="welcome-screen" class="screen active">
+    <header class="app-header">
+      <img src="./icons/wfe-logo.png" alt="World Finance Edu" class="app-logo">
+      <h1 class="app-title">🎤 SpeakReady!</h1>
+      <p class="app-tagline">Practice English alone, until you're ready for the world.</p>
+    </header>
+
+    <main class="welcome-content">
+      <!-- How to Use (collapsible) -->
+      <details class="card how-to-use">
+        <summary class="how-to-summary">📖 使い方を見る</summary>
+        <div class="how-to-content">
+          <ol class="how-to-steps">
+            <li><strong>英文を入力</strong> — 練習したい英語のフレーズや文章を入力欄に入力するか、下の「よく使うフレーズ」から選びます。</li>
+            <li><strong>「練習を始める」をタップ</strong> — 練習画面に移動します。お手本の文が表示されます。</li>
+            <li><strong>マイクボタンを押して話す</strong> — ボタンが赤く光っている間に、お手本の文を声に出して読みます。途中で少し間が空いても大丈夫です。</li>
+            <li><strong>もう一度マイクボタンを押して停止</strong> — 話し終わったらボタンを押して録音を止めます。</li>
+            <li><strong>結果を確認</strong> — スコアと単語ごとの評価が表示されます。
+              <ul class="how-to-legend">
+                <li><span class="legend-dot legend-correct"></span> <strong>緑</strong> = 正確に発音できました</li>
+                <li><span class="legend-dot legend-unclear"></span> <strong>黄</strong> = 聞き取れたが不明瞭です</li>
+                <li><span class="legend-dot legend-wrong"></span> <strong>赤</strong> = 違う音に聞こえました（下に何と聞こえたか表示）</li>
+              </ul>
+            </li>
+          </ol>
+          <div class="how-to-note">
+            <p class="how-to-note-title">📌 このアプリの特徴</p>
+            <p>このアプリは、<strong>自分で考えた文章や長いフレーズを自由に練習できる</strong>ことが強みです。一字一句の発音を細かく分析するツールではなく、文章全体が英語として伝わるかをチェックできます。</p>
+            <p>例えばRとLの違いなど、大きな発音の差は検出できますが、ネイティブレベルの音素分析ではありません。<strong>「伝わる英語」を繰り返し練習する</strong>ためのツールとしてご活用ください。</p>
+          </div>
+          <div class="how-to-note how-to-note-mic">
+            <p class="how-to-note-title">🎙️ マイクの許可について</p>
+            <p>初回利用時にブラウザから「マイクの使用を許可しますか？」と表示されます。<strong>必ず「許可」を選んでください。</strong></p>
+            <p><strong>許可が出ない場合：</strong></p>
+            <ul class="how-to-mic-steps">
+              <li><strong>PC（Chrome）</strong> — アドレスバー左の🔒アイコン → 「サイトの設定」→ マイクを「許可」に変更</li>
+              <li><strong>iPhone / iPad</strong> — 「設定」→「Safari」（またはChrome）→「マイク」をONに</li>
+              <li><strong>Android</strong> — Chromeのアドレスバー左の🔒 →「権限」→ マイクを「許可」に</li>
+            </ul>
+          </div>
+          <p class="how-to-tip">💡 <strong>ヒント:</strong> Google Chromeでの使用を推奨します。静かな環境で、はっきりと話してみましょう。</p>
+        </div>
+      </details>
+
+      <!-- Input Section -->
+      <section class="card input-section">
+        <label for="sentence-input" class="input-label">練習したい英文を入力してください</label>
+        <div class="textarea-wrapper">
+          <textarea id="sentence-input" class="sentence-textarea" rows="5"
+            placeholder="例: Nice to meet you.&#10;&#10;長い文章もOK。途中で少し止まっても録音は続きます。"></textarea>
+          <button id="clear-input-btn" class="btn-clear-input hidden" aria-label="クリア">✕</button>
+        </div>
+        <button id="start-btn" class="btn-primary btn-large">練習を始める →</button>
+        <p class="input-hint">💡 単語よりも文章で練習するほうが効果的です！<br>例: "I'd like to make a reservation for two."</p>
+      </section>
+
+      <!-- Pronunciation Tip (natural lead to Udemy) -->
+      <div class="pronunciation-tip">
+        <p>💬 発音の基礎（子音ペア・リズム・アメリカ英語 vs イギリス英語）は、<a href="https://www.udemy.com/course/8-thyjqd/?couponCode=5CF9C8901FC1DED31FF2" target="_blank" rel="noopener noreferrer">Udemyコースの無料プレビュー</a>で学べます。</p>
+      </div>
+
+      <!-- Quick Phrases with Tabs -->
+      <section class="card phrases-section">
+        <h2 class="section-title">よく使うフレーズ</h2>
+        <div class="phrase-tabs" id="phrase-tabs"></div>
+        <div id="phrases-container" class="phrases-grid"></div>
+      </section>
+
+      <!-- Practice History -->
+      <section id="history-section" class="card history-section hidden">
+        <div class="section-header">
+          <h2 class="section-title">練習履歴</h2>
+          <button id="clear-history-btn" class="btn-text btn-small">クリア</button>
+        </div>
+        <ul id="history-list" class="history-list"></ul>
+      </section>
+
+      <!-- Udemy Course Promotion -->
+      <section class="promo-banner">
+        <div class="promo-badge">🎓 このアプリの開発者によるUdemyコース</div>
+        <h3 class="promo-title">ビジネス英語 独学で上達する考え方</h3>
+        <p class="promo-subtitle">英語が苦手だった日本人が外資系グローバル本社で働くまでにやった8つのこと</p>
+        <div class="promo-divider"></div>
+        <div class="promo-instructor">
+          <div class="promo-instructor-info">
+            <p class="promo-instructor-name">講師: 潮田 豊幸（ウシオダ トヨユキ）</p>
+            <p class="promo-instructor-bio">元 外資系不動産ファンド グローバル本社 経営企画責任者。英語が苦手だった経験から、日本人が効率的にビジネス英語を伸ばすメソッドを体系化。</p>
+          </div>
+        </div>
+        <div class="promo-divider"></div>
+        <p class="promo-description">発音だけでなく、<strong>リスニング・スピーキング・語順・自己紹介</strong>まで — 英語力を総合的に伸ばす実践的な8つのアクションを51分に凝縮。</p>
+        <div class="promo-stats">
+          <span class="promo-stat">⭐ 4.94 評価</span>
+          <span class="promo-stat">🎬 51分</span>
+          <span class="promo-stat">📚 全27レクチャー</span>
+        </div>
+        <div class="promo-pricing">
+          <span class="promo-price-original">$49.99</span>
+          <span class="promo-price-discount">$12.99</span>
+          <span class="promo-price-label">割引中</span>
+        </div>
+        <a href="https://www.udemy.com/course/8-thyjqd/?couponCode=5CF9C8901FC1DED31FF2"
+           target="_blank" rel="noopener noreferrer" class="promo-cta">
+          割引価格でコースを見る →
+        </a>
+        <p class="promo-note">※ クーポンには有効期限があります。お早めにどうぞ。</p>
+      </section>
+    </main>
+  </div>
+
+  <!-- ========== PRACTICE SCREEN ========== -->
+  <div id="practice-screen" class="screen hidden">
+    <header class="practice-header">
+      <button id="back-btn" class="btn-icon" aria-label="戻る">← 戻る</button>
+    </header>
+
+    <main class="practice-content">
+      <!-- Target Sentence -->
+      <section class="card target-section">
+        <p class="target-label">お手本の文</p>
+        <p id="target-sentence" class="target-text"></p>
+      </section>
+
+      <!-- Recording Section -->
+      <section class="record-section">
+        <p id="record-status" class="record-status">マイクボタンを押して話してください</p>
+        <button id="record-btn" class="record-btn" aria-label="録音">
+          <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </button>
+        <canvas id="audio-visualizer" class="audio-visualizer hidden" width="280" height="60"></canvas>
+        <p id="interim-text" class="interim-text"></p>
+      </section>
+
+      <!-- Results Section -->
+      <div id="results-section" class="results-section hidden">
+        <section class="card results-card">
+          <!-- Score -->
+          <div class="score-display">
+            <div id="score-circle" class="score-circle">
+              <span id="score-value" class="score-value">0</span>
+              <span class="score-unit">%</span>
+            </div>
+            <p id="score-message" class="score-message"></p>
+          </div>
+
+          <!-- Word Comparison -->
+          <div class="comparison-section">
+            <p class="comparison-label">単語ごとの結果:</p>
+            <div class="result-legend">
+              <span class="legend-item"><span class="legend-dot legend-correct"></span>正確</span>
+              <span class="legend-item"><span class="legend-dot legend-unclear"></span>不明瞭</span>
+              <span class="legend-item"><span class="legend-dot legend-wrong"></span>違う音に聞こえました</span>
+            </div>
+            <div id="word-results" class="word-results"></div>
+          </div>
+
+          <div class="comparison-section">
+            <p class="comparison-label">あなたの発音:</p>
+            <p id="spoken-text" class="spoken-text"></p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="result-actions">
+            <button id="retry-btn" class="btn-primary">🔄 もう一度</button>
+            <button id="new-sentence-btn" class="btn-secondary">📝 新しい文を練習</button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
