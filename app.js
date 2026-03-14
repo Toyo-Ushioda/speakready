@@ -718,33 +718,34 @@ function compareTexts(target, spoken, confidence, alternatives) {
     : 0;
 
   // Precision penalty: extra words reduce the score
-  // Each extra word costs 15 points (capped so it doesn't go below 0)
-  const extraPenalty = Math.min(extraWords.length * 15, 60);
+  const extraPenalty = Math.min(extraWords.length * 10, 40);
 
-  // Pronunciation quality from speech recognition confidence
-  // Steeper curve for longer sentences to punish poor pronunciation harder
+  // --- Determine word-level color FIRST, then derive score from colors ---
   const rawConfidence = confidence > 0 ? confidence : 0.5;
   const wordCount = targetWords.length;
-  const curvePower = wordCount >= 6 ? 8.0 : wordCount <= 2 ? 1.5 : 1.5 + (wordCount - 2) * 1.625;
-  const confidenceScore = Math.pow(rawConfidence, curvePower) * 100;
 
-  // Dynamic weighting: short inputs rely on word accuracy (API confidence is unreliable),
-  // longer sentences rely almost entirely on pronunciation confidence
-  let wordWeight, confWeight;
-  if (wordCount <= 2) {
-    wordWeight = 0.85;
-    confWeight = 0.15;
-  } else if (wordCount >= 6) {
-    wordWeight = 0.1;
-    confWeight = 0.9;
-  } else {
-    // Linear interpolation: 2 words → 0.85/0.15, 6 words → 0.1/0.9
-    const t = (wordCount - 2) / 4;
-    wordWeight = 0.85 - t * 0.75;
-    confWeight = 0.15 + t * 0.75;
+  // Assign each word a color grade based on clarity + API confidence
+  // For longer sentences, require higher confidence to earn green
+  const confThresholdGreen = wordCount >= 6 ? 0.92 : wordCount <= 2 ? 0.7 : 0.7 + (wordCount - 2) * 0.055;
+  const confThresholdYellow = wordCount >= 6 ? 0.82 : wordCount <= 2 ? 0.5 : 0.5 + (wordCount - 2) * 0.08;
+
+  for (const r of results) {
+    if (!r.correct) {
+      r.color = 'red';      // 0 points
+    } else if (r.clarity >= 0.9 && rawConfidence >= confThresholdGreen) {
+      r.color = 'green';    // 1.0 points
+    } else if (r.clarity >= 0.5 && rawConfidence >= confThresholdYellow) {
+      r.color = 'yellow';   // 0.5 points
+    } else {
+      r.color = 'orange';   // 0.25 points
+    }
   }
 
-  const rawScore = recallScore * wordWeight + confidenceScore * confWeight - extraPenalty;
+  // Score = percentage of points earned from word colors
+  const colorPoints = { green: 1.0, yellow: 0.5, orange: 0.25, red: 0 };
+  const totalPoints = results.reduce((sum, r) => sum + colorPoints[r.color], 0);
+  const maxPoints = results.length;
+  const rawScore = maxPoints > 0 ? (totalPoints / maxPoints) * 100 - extraPenalty : 0;
   const score = Math.max(0, Math.min(100, Math.round(rawScore)));
 
   return {
@@ -753,7 +754,7 @@ function compareTexts(target, spoken, confidence, alternatives) {
     extraWords,
     matchCount: Math.round(weightedScore * 10) / 10,
     totalWords: targetWords.length,
-    confidence: Math.round(confidenceScore)
+    confidence: Math.round(rawConfidence * 100)
   };
 }
 
@@ -763,14 +764,11 @@ function compareTexts(target, spoken, confidence, alternatives) {
    ============================================================ */
 
 function renderResults(comparison, transcript) {
-  // Word-by-word coloring — factor in overall score so colors match the grade
-  const overallScore = comparison.score;
+  // Word-by-word coloring — uses pre-assigned color from comparison
   let html = comparison.results
     .map(r => {
-      let cls = 'word-wrong';
-      if (r.correct && r.clarity >= 0.9 && overallScore >= 80) cls = 'word-correct';
-      else if (r.correct && overallScore >= 60) cls = 'word-unclear';
-      else if (r.correct) cls = 'word-poor';
+      const colorMap = { green: 'word-correct', yellow: 'word-unclear', orange: 'word-poor', red: 'word-wrong' };
+      const cls = colorMap[r.color] || 'word-wrong';
 
       // For wrong words, show what was heard instead
       let annotation = '';
