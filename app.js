@@ -725,7 +725,7 @@ function compareTexts(target, spoken, confidence, alternatives) {
   // Steeper curve for longer sentences to punish poor pronunciation harder
   const rawConfidence = confidence > 0 ? confidence : 0.5;
   const wordCount = targetWords.length;
-  const curvePower = wordCount >= 6 ? 2.5 : wordCount <= 2 ? 1.5 : 1.5 + (wordCount - 2) * 0.25;
+  const curvePower = wordCount >= 6 ? 3.0 : wordCount <= 2 ? 1.5 : 1.5 + (wordCount - 2) * 0.375;
   const confidenceScore = Math.pow(rawConfidence, curvePower) * 100;
 
   // Dynamic weighting: short inputs rely on word accuracy (API confidence is unreliable),
