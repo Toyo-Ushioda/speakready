@@ -99,9 +99,19 @@ document.addEventListener('DOMContentLoaded', () => {
     welcomeScreen.classList.add('hidden');
     welcomeScreen.classList.remove('active');
   }
-  // Detect in-app browsers (Twitter, Facebook, Instagram, LINE, etc.)
-  const isInAppBrowser = /FBAN|FBAV|Twitter|Line\/|Instagram|Snapchat|Pinterest/i.test(navigator.userAgent)
-    || (navigator.userAgent.includes('wv') && isMobile);  // Android WebView
+  // Detect in-app browsers (X/Twitter, Facebook, Instagram, LINE, etc.)
+  const ua = navigator.userAgent;
+  const isInAppBrowser =
+    // Known app identifiers
+    /FBAN|FBAV|Twitter|Line\/|Instagram|Snapchat|Pinterest/i.test(ua)
+    // Android WebView
+    || (ua.includes('wv') && isMobile)
+    // iOS in-app browser: has iPhone/iPad but no "Safari" in UA
+    || (/iPhone|iPad|iPod/.test(ua) && !ua.includes('Safari'))
+    // Android in-app: has Android + Chrome but also has ";" before "Build" (WebView pattern)
+    || (/Android/.test(ua) && /Version\/[\d.]+/.test(ua) && ua.includes('Chrome'))
+    // Generic: no standalone browser identifier
+    || (isMobile && !navigator.standalone && window.matchMedia('(display-mode: browser)').matches === false && !ua.includes('Safari') && !ua.includes('Chrome'));
   const inappWarning = document.getElementById('inapp-warning');
   const inappCopy = document.getElementById('inapp-copy');
 
