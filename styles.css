@@ -907,11 +907,15 @@ body {
   line-height: 1.5;
 }
 
-.mobile-mic-tip .mic-tip-copy {
+.mic-tip-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.mic-tip-actions .btn-small {
   font-size: 0.8rem;
-  color: #0369a1;
-  text-decoration: underline;
-  margin-top: 4px;
 }
 
 @media (max-width: 600px) {

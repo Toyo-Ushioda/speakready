@@ -199,8 +199,11 @@
 
       <!-- Mobile mic tip (always visible on mobile) -->
       <div class="mobile-mic-tip">
-        <p>💡 マイクが動かない場合は、ChromeまたはSafariで直接このページを開いてください。SNSアプリ内のブラウザではマイクが使えない場合があります。</p>
-        <button class="mic-tip-copy btn-text">URLをコピー</button>
+        <p>💡 マイクが動かない場合は、下のボタンからブラウザで開いてください。</p>
+        <div class="mic-tip-actions">
+          <button id="open-in-browser" class="btn-small btn-primary">Chrome / Safariで開く</button>
+          <button class="mic-tip-copy btn-small btn-secondary">URLをコピー</button>
+        </div>
       </div>
 
       <!-- Recording Section -->

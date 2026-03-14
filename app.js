@@ -121,7 +121,36 @@ document.addEventListener('DOMContentLoaded', () => {
   clearHistoryBtn.addEventListener('click', handleClearHistory);
   compatDismiss.addEventListener('click', () => compatWarning.classList.add('hidden'));
 
-  // Mobile mic tip — URL copy button
+  // Mobile mic tip — "Open in browser" + URL copy buttons
+  const openInBrowserBtn = document.getElementById('open-in-browser');
+  if (openInBrowserBtn) {
+    openInBrowserBtn.addEventListener('click', () => {
+      const url = window.location.href;
+      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const isAndroid = /Android/i.test(navigator.userAgent);
+
+      if (isAndroid) {
+        // Android: try intent URL to open in Chrome
+        const intentUrl = 'intent://' + url.replace(/^https?:\/\//, '') +
+          '#Intent;scheme=https;package=com.android.chrome;end';
+        window.location.href = intentUrl;
+      } else if (isIOS) {
+        // iOS: try x-safari URL scheme, fallback to copy
+        // Safari doesn't have a reliable scheme, so open via googlechrome:// or copy
+        const chromeUrl = 'googlechrome://' + url.replace(/^https?:\/\//, '');
+        window.location.href = chromeUrl;
+        // Fallback: if Chrome not installed, copy URL after short delay
+        setTimeout(() => {
+          navigator.clipboard.writeText(url).then(() => {
+            openInBrowserBtn.textContent = 'URLをコピーしました。Safariに貼り付けてください';
+          });
+        }, 2000);
+      } else {
+        window.open(url, '_system') || window.open(url, '_blank');
+      }
+    });
+  }
+
   const micTipCopy = document.querySelector('.mic-tip-copy');
   if (micTipCopy) {
     micTipCopy.addEventListener('click', () => {
