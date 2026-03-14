@@ -712,29 +712,30 @@ function compareTexts(target, spoken, confidence, alternatives) {
     : 0;
 
   // Precision penalty: extra words reduce the score
-  // Each extra word costs 10 points (capped so it doesn't go below 0)
-  const extraPenalty = Math.min(extraWords.length * 10, 50);
+  // Each extra word costs 15 points (capped so it doesn't go below 0)
+  const extraPenalty = Math.min(extraWords.length * 15, 60);
 
   // Pronunciation quality from speech recognition confidence
-  // Apply a curve that punishes low confidence more aggressively
+  // Steeper curve for longer sentences to punish poor pronunciation harder
   const rawConfidence = confidence > 0 ? confidence : 0.5;
-  const confidenceScore = Math.pow(rawConfidence, 1.5) * 100;
+  const wordCount = targetWords.length;
+  const curvePower = wordCount >= 6 ? 2.0 : wordCount <= 2 ? 1.5 : 1.5 + (wordCount - 2) * 0.125;
+  const confidenceScore = Math.pow(rawConfidence, curvePower) * 100;
 
   // Dynamic weighting: short inputs rely on word accuracy (API confidence is unreliable),
   // longer sentences rely heavily on pronunciation confidence
-  const wordCount = targetWords.length;
   let wordWeight, confWeight;
   if (wordCount <= 2) {
     wordWeight = 0.85;
     confWeight = 0.15;
   } else if (wordCount >= 6) {
-    wordWeight = 0.2;
-    confWeight = 0.8;
+    wordWeight = 0.15;
+    confWeight = 0.85;
   } else {
-    // Linear interpolation: 2 words → 0.85/0.15, 6 words → 0.2/0.8
+    // Linear interpolation: 2 words → 0.85/0.15, 6 words → 0.15/0.85
     const t = (wordCount - 2) / 4;
-    wordWeight = 0.85 - t * 0.65;
-    confWeight = 0.15 + t * 0.65;
+    wordWeight = 0.85 - t * 0.7;
+    confWeight = 0.15 + t * 0.7;
   }
 
   const rawScore = recallScore * wordWeight + confidenceScore * confWeight - extraPenalty;
