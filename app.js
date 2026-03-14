@@ -639,11 +639,11 @@ function compareTexts(target, spoken, confidence, alternatives) {
     }
 
     // Strategy 5: Fuzzy prefix match — "design" ≈ "designed", "reserve" ≈ "reservation"
-    // One word must start with the other, and the shorter must be at least 4 chars
+    // One word must start with the other, and the shorter must be at least 5 chars
     if (!found) {
       for (let j = spokenIdx; j < spokenWords.length; j++) {
         const sw = stripToAlpha(spokenWords[j]);
-        if (sw.length >= 4 && twAlpha.length >= 4) {
+        if (sw.length >= 5 && twAlpha.length >= 5) {
           if (sw.startsWith(twAlpha) || twAlpha.startsWith(sw)) {
             found = true;
             spokenMatched[j] = true;
@@ -655,7 +655,7 @@ function compareTexts(target, spoken, confidence, alternatives) {
       }
     }
 
-    // Check alternative-based confidence penalty
+    // Check alternative-based confidence penalty (strict: triggers at 30% disagreement)
     let wordConfidence = 1.0;
     if (found && altWordSets.length > 0) {
       let missingCount = 0;
@@ -663,8 +663,8 @@ function compareTexts(target, spoken, confidence, alternatives) {
         if (!altSet.has(twAlpha)) missingCount++;
       }
       const missingRatio = missingCount / altWordSets.length;
-      if (missingRatio > 0.5) {
-        wordConfidence = 0.3 + (1 - missingRatio) * 0.4;
+      if (missingRatio > 0.3) {
+        wordConfidence = 0.2 + (1 - missingRatio) * 0.3;
       }
     }
 
@@ -715,23 +715,24 @@ function compareTexts(target, spoken, confidence, alternatives) {
   const extraPenalty = Math.min(extraWords.length * 10, 50);
 
   // Pronunciation quality from speech recognition confidence
-  const confidenceScore = (confidence > 0 ? confidence : 0.5) * 100;
+  // Apply a curve that punishes low confidence more aggressively
+  const rawConfidence = confidence > 0 ? confidence : 0.5;
+  const confidenceScore = Math.pow(rawConfidence, 1.5) * 100;
 
-  // Dynamic weighting: short sentences rely more on word accuracy,
-  // long sentences rely more on confidence (API gives lower confidence for 1-2 words)
+  // Dynamic weighting: heavier confidence weight = pronunciation quality matters more
   const wordCount = targetWords.length;
   let wordWeight, confWeight;
   if (wordCount <= 2) {
-    wordWeight = 0.8;
-    confWeight = 0.2;
+    wordWeight = 0.6;
+    confWeight = 0.4;
   } else if (wordCount >= 6) {
-    wordWeight = 0.3;
-    confWeight = 0.7;
+    wordWeight = 0.2;
+    confWeight = 0.8;
   } else {
-    // Linear interpolation: 2 words → 0.8/0.2, 6 words → 0.3/0.7
+    // Linear interpolation: 2 words → 0.6/0.4, 6 words → 0.2/0.8
     const t = (wordCount - 2) / 4;
-    wordWeight = 0.8 - t * 0.5;
-    confWeight = 0.2 + t * 0.5;
+    wordWeight = 0.6 - t * 0.4;
+    confWeight = 0.4 + t * 0.4;
   }
 
   const rawScore = recallScore * wordWeight + confidenceScore * confWeight - extraPenalty;
@@ -783,17 +784,21 @@ function renderResults(comparison, transcript) {
 
   // Score circle color
   scoreCircle.className = 'score-circle';
-  if (score >= 90) {
+  if (score >= 95) {
     scoreCircle.classList.add('excellent');
-    scoreMessage.textContent = '素晴らしい！完璧です！';
+    scoreMessage.textContent = '素晴らしい！ネイティブレベルです！';
     scoreMessage.style.color = 'var(--color-correct)';
-  } else if (score >= 70) {
+  } else if (score >= 80) {
     scoreCircle.classList.add('good');
-    scoreMessage.textContent = 'いい調子です！もう一度挑戦しましょう';
+    scoreMessage.textContent = 'いい調子です！もう少し発音を意識してみましょう';
     scoreMessage.style.color = '#a16207';
+  } else if (score >= 60) {
+    scoreCircle.classList.add('needs-work');
+    scoreMessage.textContent = 'もう一度挑戦！口の形を意識してゆっくり話しましょう';
+    scoreMessage.style.color = 'var(--color-wrong)';
   } else {
     scoreCircle.classList.add('needs-work');
-    scoreMessage.textContent = 'ゆっくり、はっきり話してみましょう';
+    scoreMessage.textContent = 'お手本をよく聞いて、一語ずつ練習しましょう';
     scoreMessage.style.color = 'var(--color-wrong)';
   }
 
