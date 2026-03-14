@@ -726,8 +726,8 @@ function compareTexts(target, spoken, confidence, alternatives) {
 
   // Assign each word a color grade based on clarity + API confidence
   // For longer sentences, require higher confidence to earn green
-  const confThresholdGreen = wordCount >= 6 ? 0.92 : wordCount <= 2 ? 0.7 : 0.7 + (wordCount - 2) * 0.055;
-  const confThresholdYellow = wordCount >= 6 ? 0.82 : wordCount <= 2 ? 0.5 : 0.5 + (wordCount - 2) * 0.08;
+  const confThresholdGreen = wordCount >= 6 ? 0.85 : wordCount <= 2 ? 0.6 : 0.6 + (wordCount - 2) * 0.0625;
+  const confThresholdYellow = wordCount >= 6 ? 0.75 : wordCount <= 2 ? 0.4 : 0.4 + (wordCount - 2) * 0.0875;
 
   for (const r of results) {
     if (!r.correct) {
