@@ -80,6 +80,9 @@ let analyser = null;
 let micStream = null;
 let animationId = null;
 
+// Mobile detection
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
 // Constants
 const HISTORY_KEY = 'pronunciation-history';
 const MAX_HISTORY = 20;
@@ -321,8 +324,9 @@ function startRecognition() {
   };
 
   recognition.onend = () => {
-    // If the user didn't click stop, auto-restart (Chrome kills recognition on silence)
-    if (!userStoppedRecording && !resultProcessed) {
+    // On desktop, auto-restart when Chrome kills recognition on silence
+    // On mobile, skip auto-restart (causes mic permission issues)
+    if (!isMobile && !userStoppedRecording && !resultProcessed) {
       // Save current transcript before restart so it's not lost
       accumulatedTranscript = lastTranscript;
       accumulatedAlternatives = lastAlternatives.slice();
@@ -353,7 +357,10 @@ function startRecognition() {
 
   try {
     recognition.start();
-    startAudioVisualizer();
+    // Skip audio visualizer on mobile to avoid mic conflicts
+    if (!isMobile) {
+      startAudioVisualizer();
+    }
   } catch (e) {
     recordStatus.textContent = 'マイクを起動できませんでした。ページを再読み込みしてください';
   }
