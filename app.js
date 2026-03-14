@@ -788,11 +788,11 @@ function renderResults(comparison, transcript) {
   scoreCircle.className = 'score-circle';
   if (score >= 95) {
     scoreCircle.classList.add('excellent');
-    scoreMessage.textContent = '素晴らしい！ネイティブレベルです！';
+    scoreMessage.textContent = '素晴らしい！とてもクリアな発音です！';
     scoreMessage.style.color = 'var(--color-correct)';
   } else if (score >= 80) {
     scoreCircle.classList.add('good');
-    scoreMessage.textContent = 'いい調子です！もう少し発音を意識してみましょう';
+    scoreMessage.textContent = 'いい調子です！さらに滑らかさを意識してみましょう';
     scoreMessage.style.color = '#a16207';
   } else if (score >= 60) {
     scoreCircle.classList.add('needs-work');
@@ -800,7 +800,7 @@ function renderResults(comparison, transcript) {
     scoreMessage.style.color = 'var(--color-wrong)';
   } else {
     scoreCircle.classList.add('needs-work');
-    scoreMessage.textContent = 'お手本をよく聞いて、一語ずつ練習しましょう';
+    scoreMessage.textContent = '一語ずつゆっくり、はっきり発音してみましょう';
     scoreMessage.style.color = 'var(--color-wrong)';
   }
 
