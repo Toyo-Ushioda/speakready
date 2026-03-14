@@ -413,6 +413,15 @@ body {
   color: #b45309;
 }
 
+.how-to-note-caveat {
+  background: #fefce8;
+  border-left-color: #eab308;
+}
+
+.how-to-note-caveat .how-to-note-title {
+  color: #a16207;
+}
+
 .how-to-note-mic {
   background: #eff6ff;
   border-left-color: #3b82f6;
@@ -886,6 +895,42 @@ body {
   font-weight: 600;
   line-height: 1.5;
   color: var(--color-text);
+}
+
+/* ---------- Accent Toggle ---------- */
+.accent-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.accent-label {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.accent-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: var(--color-card);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--color-text-muted);
+}
+
+.accent-btn:hover {
+  border-color: var(--color-primary);
+}
+
+.accent-btn.accent-active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
 }
 
 /* ---------- Record Section ---------- */

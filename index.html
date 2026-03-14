@@ -96,6 +96,11 @@
             <p>このアプリは、<strong>自分で考えた文章や長いフレーズを自由に練習できる</strong>ことが強みです。一字一句の発音を細かく分析するツールではなく、文章全体が英語として伝わるかをチェックできます。</p>
             <p>例えばRとLの違いなど、大きな発音の差は検出できますが、ネイティブレベルの音素分析ではありません。<strong>「伝わる英語」を繰り返し練習する</strong>ためのツールとしてご活用ください。</p>
           </div>
+          <div class="how-to-note how-to-note-caveat">
+            <p class="how-to-note-title">⚠️ スコアについて</p>
+            <p>このアプリはブラウザの音声認識機能（Speech API）を使っています。<strong>「あなたが何を言ったか」は正確に判定できますが、リズム・イントネーション・アクセントの自然さは評価できません。</strong></p>
+            <p>スコアは「単語が正しく伝わったか」の指標です。より自然な英語を目指すには、ネイティブの音声を聞いて真似する練習も併せて行いましょう。</p>
+          </div>
           <div class="how-to-note how-to-note-mic">
             <p class="how-to-note-title">🎙️ マイクの許可について</p>
             <p>初回利用時にブラウザから「マイクの使用を許可しますか？」と表示されます。<strong>必ず「許可」を選んでください。</strong></p>
@@ -191,6 +196,13 @@
         <p class="target-label">お手本の文</p>
         <p id="target-sentence" class="target-text"></p>
       </section>
+
+      <!-- Accent Toggle -->
+      <div class="accent-toggle">
+        <label class="accent-label">アクセント:</label>
+        <button id="accent-us" class="accent-btn accent-active" data-lang="en-US">🇺🇸 American</button>
+        <button id="accent-gb" class="accent-btn" data-lang="en-GB">🇬🇧 British</button>
+      </div>
 
       <!-- Recording Section -->
       <section class="record-section">

@@ -61,6 +61,26 @@ const installBanner = document.getElementById('install-banner');
 const installBtn = document.getElementById('install-btn');
 const installDismiss = document.getElementById('install-dismiss');
 
+// Accent toggle
+const accentBtnUS = document.getElementById('accent-us');
+const accentBtnGB = document.getElementById('accent-gb');
+let selectedLang = localStorage.getItem('speakready-lang') || 'en-US';
+
+// Initialize accent buttons
+if (selectedLang === 'en-GB') {
+  accentBtnUS.classList.remove('accent-active');
+  accentBtnGB.classList.add('accent-active');
+}
+
+[accentBtnUS, accentBtnGB].forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectedLang = btn.dataset.lang;
+    localStorage.setItem('speakready-lang', selectedLang);
+    accentBtnUS.classList.toggle('accent-active', selectedLang === 'en-US');
+    accentBtnGB.classList.toggle('accent-active', selectedLang === 'en-GB');
+  });
+});
+
 // State
 let recognition = null;
 let isRecording = false;
@@ -283,7 +303,7 @@ function startRecognition() {
   clearResults();
 
   recognition = new SpeechRecognition();
-  recognition.lang = 'en-US';
+  recognition.lang = selectedLang;
   recognition.interimResults = true;
   recognition.continuous = true;
   recognition.maxAlternatives = 5;
