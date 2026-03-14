@@ -763,12 +763,14 @@ function compareTexts(target, spoken, confidence, alternatives) {
    ============================================================ */
 
 function renderResults(comparison, transcript) {
-  // Word-by-word coloring with annotations for wrong/unclear words
+  // Word-by-word coloring — factor in overall score so colors match the grade
+  const overallScore = comparison.score;
   let html = comparison.results
     .map(r => {
       let cls = 'word-wrong';
-      if (r.correct && r.clarity >= 0.8) cls = 'word-correct';
-      else if (r.correct) cls = 'word-unclear';
+      if (r.correct && r.clarity >= 0.9 && overallScore >= 80) cls = 'word-correct';
+      else if (r.correct && overallScore >= 60) cls = 'word-unclear';
+      else if (r.correct) cls = 'word-poor';
 
       // For wrong words, show what was heard instead
       let annotation = '';

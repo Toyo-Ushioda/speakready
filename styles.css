@@ -1121,6 +1121,12 @@ body {
   border: 1px dashed #f59e0b;
 }
 
+.word-poor {
+  background: #ffedd5;
+  color: #c2410c;
+  border: 1px dashed #ea580c;
+}
+
 .word-wrong {
   background: var(--color-wrong-bg);
   color: #dc2626;
