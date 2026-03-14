@@ -246,6 +246,9 @@ function toggleRecording() {
 function startRecognition() {
   if (!SpeechRecognition) return;
 
+  // Always clean up previous mic/visualizer state first
+  stopAudioVisualizer();
+
   // Reset accumulated state for fresh recording
   accumulatedTranscript = '';
   accumulatedAlternatives = [];
@@ -305,13 +308,16 @@ function startRecognition() {
   };
 
   recognition.onerror = (event) => {
+    // On no-speech, don't kill the recording — let onend handle it
+    if (event.error === 'no-speech') {
+      return;
+    }
+
     isRecording = false;
     recordBtn.classList.remove('recording');
+    stopAudioVisualizer();
 
     switch (event.error) {
-      case 'no-speech':
-        recordStatus.textContent = '音声が認識されませんでした。もう一度お試しください';
-        break;
       case 'audio-capture':
         recordStatus.textContent = 'マイクが見つかりません。マイクを接続してください';
         break;
@@ -324,10 +330,8 @@ function startRecognition() {
   };
 
   recognition.onend = () => {
-    // On desktop, auto-restart when Chrome kills recognition on silence
-    // On mobile, skip auto-restart (causes mic permission issues)
+    // Auto-restart when Chrome kills recognition on silence (not on mobile — causes mic issues)
     if (!isMobile && !userStoppedRecording && !resultProcessed) {
-      // Save current transcript before restart so it's not lost
       accumulatedTranscript = lastTranscript;
       accumulatedAlternatives = lastAlternatives.slice();
       try {
@@ -357,8 +361,11 @@ function startRecognition() {
 
   try {
     recognition.start();
-    // Skip audio visualizer on mobile to avoid mic conflicts
-    if (!isMobile) {
+    // On mobile, use CSS pulse animation instead of getUserMedia visualizer
+    // to avoid competing for mic access
+    if (isMobile) {
+      recordBtn.classList.add('pulse-recording');
+    } else {
       startAudioVisualizer();
     }
   } catch (e) {
@@ -373,6 +380,7 @@ function stopRecognition() {
   }
   isRecording = false;
   recordBtn.classList.remove('recording');
+  recordBtn.classList.remove('pulse-recording');
   stopAudioVisualizer();
 }
 
