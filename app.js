@@ -719,23 +719,23 @@ function compareTexts(target, spoken, confidence, alternatives) {
   // Steeper curve for longer sentences to punish poor pronunciation harder
   const rawConfidence = confidence > 0 ? confidence : 0.5;
   const wordCount = targetWords.length;
-  const curvePower = wordCount >= 6 ? 2.0 : wordCount <= 2 ? 1.5 : 1.5 + (wordCount - 2) * 0.125;
+  const curvePower = wordCount >= 6 ? 2.5 : wordCount <= 2 ? 1.5 : 1.5 + (wordCount - 2) * 0.25;
   const confidenceScore = Math.pow(rawConfidence, curvePower) * 100;
 
   // Dynamic weighting: short inputs rely on word accuracy (API confidence is unreliable),
-  // longer sentences rely heavily on pronunciation confidence
+  // longer sentences rely almost entirely on pronunciation confidence
   let wordWeight, confWeight;
   if (wordCount <= 2) {
     wordWeight = 0.85;
     confWeight = 0.15;
   } else if (wordCount >= 6) {
-    wordWeight = 0.15;
-    confWeight = 0.85;
+    wordWeight = 0.1;
+    confWeight = 0.9;
   } else {
-    // Linear interpolation: 2 words → 0.85/0.15, 6 words → 0.15/0.85
+    // Linear interpolation: 2 words → 0.85/0.15, 6 words → 0.1/0.9
     const t = (wordCount - 2) / 4;
-    wordWeight = 0.85 - t * 0.7;
-    confWeight = 0.15 + t * 0.7;
+    wordWeight = 0.85 - t * 0.75;
+    confWeight = 0.15 + t * 0.75;
   }
 
   const rawScore = recallScore * wordWeight + confidenceScore * confWeight - extraPenalty;
