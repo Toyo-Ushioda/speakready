@@ -99,6 +99,24 @@ document.addEventListener('DOMContentLoaded', () => {
     welcomeScreen.classList.add('hidden');
     welcomeScreen.classList.remove('active');
   }
+  // Detect in-app browsers (Twitter, Facebook, Instagram, LINE, etc.)
+  const isInAppBrowser = /FBAN|FBAV|Twitter|Line\/|Instagram|Snapchat|Pinterest/i.test(navigator.userAgent)
+    || (navigator.userAgent.includes('wv') && isMobile);  // Android WebView
+  const inappWarning = document.getElementById('inapp-warning');
+  const inappCopy = document.getElementById('inapp-copy');
+
+  if (isInAppBrowser) {
+    inappWarning.classList.remove('hidden');
+    if (inappCopy) {
+      inappCopy.addEventListener('click', () => {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          inappCopy.textContent = 'コピーしました！';
+          setTimeout(() => { inappCopy.textContent = 'URLをコピー'; }, 2000);
+        });
+      });
+    }
+  }
+
   // Check browser compatibility
   if (!SpeechRecognition) {
     compatWarning.classList.remove('hidden');

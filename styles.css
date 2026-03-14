@@ -146,6 +146,24 @@ body {
 }
 
 /* ---------- Compatibility Warning ---------- */
+.inapp-warning {
+  background: #fef2f2;
+  border-bottom: 2px solid #ef4444;
+  padding: 16px 20px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #991b1b;
+  line-height: 1.6;
+}
+
+.inapp-warning p {
+  margin-bottom: 8px;
+}
+
+.inapp-warning .btn-small {
+  margin-top: 4px;
+}
+
 .compat-warning {
   background: #fef3c7;
   border-bottom: 2px solid #f59e0b;
