@@ -1,4 +1,4 @@
-const CACHE_NAME = 'speakready-v20';
+const CACHE_NAME = 'speakready-v21';
 
 const FILES_TO_CACHE = [
   './',

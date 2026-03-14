@@ -247,9 +247,15 @@ function toggleRecording() {
 function startRecognition() {
   if (!SpeechRecognition) return;
 
-  // Abort any previous recognition to prevent stale onend from interfering
+  // Clean up any previous recognition — don't abort, just detach handlers and null out
   if (recognition) {
-    try { recognition.abort(); } catch (e) {}
+    try {
+      recognition.onstart = null;
+      recognition.onresult = null;
+      recognition.onerror = null;
+      recognition.onend = null;
+      recognition.abort();
+    } catch (e) {}
     recognition = null;
   }
 
@@ -260,9 +266,21 @@ function startRecognition() {
   recognitionGeneration++;
   const myGeneration = recognitionGeneration;
 
-  // Reset accumulated state for fresh recording
+  // Reset all state for fresh recording
   accumulatedTranscript = '';
   accumulatedAlternatives = [];
+  userStoppedRecording = false;
+  lastTranscript = '';
+  lastConfidence = 0;
+  lastAlternatives = [];
+  resultProcessed = false;
+  isRecording = true;
+
+  // Set visual state immediately — don't wait for onstart
+  recordBtn.classList.add('recording');
+  recordStatus.textContent = '話してください... 終わったらボタンを押してください';
+  interimText.textContent = '';
+  clearResults();
 
   recognition = new SpeechRecognition();
   recognition.lang = 'en-US';
@@ -272,19 +290,6 @@ function startRecognition() {
 
   recognition.onstart = () => {
     if (myGeneration !== recognitionGeneration) return;
-    isRecording = true;
-    // Only reset state on fresh start, not auto-restart
-    if (!accumulatedTranscript) {
-      userStoppedRecording = false;
-      lastTranscript = '';
-      lastConfidence = 0;
-      lastAlternatives = [];
-      resultProcessed = false;
-      recordBtn.classList.add('recording');
-      recordStatus.textContent = '話してください... 終わったらボタンを押してください';
-      interimText.textContent = '';
-      clearResults();
-    }
   };
 
   recognition.onresult = (event) => {
@@ -372,9 +377,10 @@ function startRecognition() {
       recordStatus.textContent = '音声が認識されませんでした。もう一度お試しください';
     }
 
-    // Reset accumulated state for next recording
+    // Clean up for next recording — null out so startRecognition doesn't try to abort a dead object
     accumulatedTranscript = '';
     accumulatedAlternatives = [];
+    recognition = null;
   };
 
   try {
@@ -393,8 +399,8 @@ function startRecognition() {
 
 function stopRecognition() {
   userStoppedRecording = true;  // Prevent auto-restart in onend
-  if (recognition && isRecording) {
-    recognition.stop();
+  if (recognition) {
+    try { recognition.stop(); } catch (e) {}
   }
   isRecording = false;
   recordBtn.classList.remove('recording');
