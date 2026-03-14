@@ -730,11 +730,19 @@ function compareTexts(target, spoken, confidence, alternatives) {
   const confThresholdYellow = wordCount >= 6 ? 0.75 : wordCount <= 2 ? 0.4 : 0.4 + (wordCount - 2) * 0.0875;
 
   for (const r of results) {
+    // R-containing words get stricter thresholds (hardest sound for Japanese speakers)
+    const wordAlpha = r.word.toLowerCase().replace(/[^a-z]/g, '');
+    const hasR = /r/.test(wordAlpha);
+    const greenConf = hasR ? Math.min(confThresholdGreen + 0.08, 0.97) : confThresholdGreen;
+    const yellowConf = hasR ? Math.min(confThresholdYellow + 0.08, 0.90) : confThresholdYellow;
+    const clarityGreen = hasR ? 0.95 : 0.9;
+    const clarityYellow = hasR ? 0.7 : 0.5;
+
     if (!r.correct) {
       r.color = 'red';      // 0 points
-    } else if (r.clarity >= 0.9 && rawConfidence >= confThresholdGreen) {
+    } else if (r.clarity >= clarityGreen && rawConfidence >= greenConf) {
       r.color = 'green';    // 1.0 points
-    } else if (r.clarity >= 0.5 && rawConfidence >= confThresholdYellow) {
+    } else if (r.clarity >= clarityYellow && rawConfidence >= yellowConf) {
       r.color = 'yellow';   // 0.5 points
     } else {
       r.color = 'orange';   // 0.25 points
