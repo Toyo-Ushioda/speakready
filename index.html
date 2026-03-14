@@ -22,13 +22,6 @@
 </head>
 <body>
 
-  <!-- In-App Browser Warning (Twitter, Facebook, LINE, etc.) -->
-  <div id="inapp-warning" class="inapp-warning hidden">
-    <p>⚠️ <strong>アプリ内ブラウザではマイクが使えません。</strong></p>
-    <p>右上の「⋮」メニューから「ブラウザで開く」を選んでChromeまたはSafariで開いてください。</p>
-    <button id="inapp-copy" class="btn-small btn-primary">URLをコピー</button>
-  </div>
-
   <!-- Browser Compatibility Warning -->
   <div id="compat-warning" class="compat-warning hidden">
     <p>⚠️ このアプリはGoogle Chromeでの使用を推奨します。他のブラウザでは音声認識が動作しない場合があります。</p>
@@ -203,6 +196,12 @@
         <p class="target-label">お手本の文</p>
         <p id="target-sentence" class="target-text"></p>
       </section>
+
+      <!-- Mobile mic tip (always visible on mobile) -->
+      <div class="mobile-mic-tip">
+        <p>💡 マイクが動かない場合は、ChromeまたはSafariで直接このページを開いてください。SNSアプリ内のブラウザではマイクが使えない場合があります。</p>
+        <button class="mic-tip-copy btn-text">URLをコピー</button>
+      </div>
 
       <!-- Recording Section -->
       <section class="record-section">

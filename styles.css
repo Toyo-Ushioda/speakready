@@ -894,6 +894,32 @@ body {
   align-items: center;
 }
 
+/* ---------- Mobile Mic Tip ---------- */
+.mobile-mic-tip {
+  display: none;  /* Hidden on desktop */
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  color: #0369a1;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.mobile-mic-tip .mic-tip-copy {
+  font-size: 0.8rem;
+  color: #0369a1;
+  text-decoration: underline;
+  margin-top: 4px;
+}
+
+@media (max-width: 600px) {
+  .mobile-mic-tip {
+    display: block;
+  }
+}
+
 /* ---------- Target Section ---------- */
 .target-section {
   width: 100%;
