@@ -73,6 +73,7 @@ let resultProcessed = false;
 let userStoppedRecording = false;  // true only when user clicks stop button
 let accumulatedTranscript = '';    // Text accumulated across auto-restarts
 let accumulatedAlternatives = [];  // Alternatives accumulated across auto-restarts
+let recognitionGeneration = 0;     // Guards against stale onend/onerror callbacks
 
 // Audio visualizer state
 let audioContext = null;
@@ -246,8 +247,18 @@ function toggleRecording() {
 function startRecognition() {
   if (!SpeechRecognition) return;
 
+  // Abort any previous recognition to prevent stale onend from interfering
+  if (recognition) {
+    try { recognition.abort(); } catch (e) {}
+    recognition = null;
+  }
+
   // Always clean up previous mic/visualizer state first
   stopAudioVisualizer();
+
+  // Increment generation so stale callbacks from aborted recognition are ignored
+  recognitionGeneration++;
+  const myGeneration = recognitionGeneration;
 
   // Reset accumulated state for fresh recording
   accumulatedTranscript = '';
@@ -260,6 +271,7 @@ function startRecognition() {
   recognition.maxAlternatives = 5;
 
   recognition.onstart = () => {
+    if (myGeneration !== recognitionGeneration) return;
     isRecording = true;
     // Only reset state on fresh start, not auto-restart
     if (!accumulatedTranscript) {
@@ -276,6 +288,7 @@ function startRecognition() {
   };
 
   recognition.onresult = (event) => {
+    if (myGeneration !== recognitionGeneration) return;
     let sessionTranscript = '';
     let latestConfidence = 0;
     const alternatives = [];
@@ -308,6 +321,7 @@ function startRecognition() {
   };
 
   recognition.onerror = (event) => {
+    if (myGeneration !== recognitionGeneration) return;
     // On no-speech, don't kill the recording — let onend handle it
     if (event.error === 'no-speech') {
       return;
@@ -315,6 +329,7 @@ function startRecognition() {
 
     isRecording = false;
     recordBtn.classList.remove('recording');
+    recordBtn.classList.remove('pulse-recording');
     stopAudioVisualizer();
 
     switch (event.error) {
@@ -330,6 +345,8 @@ function startRecognition() {
   };
 
   recognition.onend = () => {
+    if (myGeneration !== recognitionGeneration) return;
+
     // Auto-restart when Chrome kills recognition on silence (not on mobile — causes mic issues)
     if (!isMobile && !userStoppedRecording && !resultProcessed) {
       accumulatedTranscript = lastTranscript;
@@ -344,6 +361,7 @@ function startRecognition() {
 
     isRecording = false;
     recordBtn.classList.remove('recording');
+    recordBtn.classList.remove('pulse-recording');
     stopAudioVisualizer();
 
     if (!resultProcessed && lastTranscript) {
