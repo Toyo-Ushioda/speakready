@@ -859,6 +859,18 @@ function handleClearHistory() {
    ============================================================ */
 
 const PHRASE_CATEGORIES = {
+  "Rの発音 練習 ⭐": [
+    "The restaurant review was really remarkable.",
+    "I'd rather read the report before the presentation.",
+    "Are you ready for the regular meeting on Friday?",
+    "The room reservation is already arranged.",
+    "Our representative will arrive around three.",
+    "Right now, the interest rate is relatively low.",
+    "The railroad runs right through the rural area.",
+    "I really appreciate your rapid response.",
+    "Remember to bring the reference materials to the room.",
+    "The research results were released last Friday."
+  ],
   "あいさつ・日常": [
     "Nice to meet you.",
     "How are you doing?",
@@ -882,18 +894,6 @@ const PHRASE_CATEGORIES = {
     "I'll have the same thing, please.",
     "Could I get a table for two?",
     "Is this on sale?"
-  ],
-  "Rの発音 練習": [
-    "The restaurant review was really remarkable.",
-    "I'd rather read the report before the presentation.",
-    "Are you ready for the regular meeting on Friday?",
-    "The room reservation is already arranged.",
-    "Our representative will arrive around three.",
-    "Right now, the interest rate is relatively low.",
-    "The railroad runs right through the rural area.",
-    "I really appreciate your rapid response.",
-    "Remember to bring the reference materials to the room.",
-    "The research results were released last Friday."
   ],
   "旅行・交通": [
     "How do I get to the station?",
