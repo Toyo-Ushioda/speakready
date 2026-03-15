@@ -19,14 +19,8 @@
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 // Screens
-const registerScreen = document.getElementById('register-screen');
 const welcomeScreen = document.getElementById('welcome-screen');
 const practiceScreen = document.getElementById('practice-screen');
-
-// Registration elements
-const registerEmail = document.getElementById('register-email');
-const registerBtn = document.getElementById('register-btn');
-const registerError = document.getElementById('register-error');
 
 // Welcome screen elements
 const sentenceInput = document.getElementById('sentence-input');
@@ -87,18 +81,7 @@ const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 // Constants
 const HISTORY_KEY = 'pronunciation-history';
 const MAX_HISTORY = 20;
-const REGISTERED_KEY = 'speakready-registered';
-const GFORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSey-xtrbBzVTxxQBNiq9mV7O3-GP2SzfE9Q1e5rU7ziMeuXcA/formResponse';
-const GFORM_EMAIL_FIELD = 'entry.811181247';
-
 document.addEventListener('DOMContentLoaded', () => {
-  // Check if user is already registered
-  if (!localStorage.getItem(REGISTERED_KEY)) {
-    registerScreen.classList.remove('hidden');
-    registerScreen.classList.add('active');
-    welcomeScreen.classList.add('hidden');
-    welcomeScreen.classList.remove('active');
-  }
   // Check browser compatibility
   if (!SpeechRecognition) {
     compatWarning.classList.remove('hidden');
@@ -151,15 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Registration form
-  registerBtn.addEventListener('click', handleRegister);
-  registerEmail.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleRegister();
-    }
-  });
-
   // Register service worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./service-worker.js').catch(() => {});
@@ -173,8 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function showScreen(screen) {
   // Hide all screens first
-  registerScreen.classList.add('hidden');
-  registerScreen.classList.remove('active');
   welcomeScreen.classList.add('hidden');
   welcomeScreen.classList.remove('active');
   practiceScreen.classList.add('hidden');
@@ -190,42 +162,6 @@ function showScreen(screen) {
     practiceScreen.classList.add('active');
     clearResults();
   }
-}
-
-function handleRegister() {
-  const email = registerEmail.value.trim();
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!email || !emailRegex.test(email)) {
-    registerEmail.classList.add('error');
-    registerError.classList.remove('hidden');
-    return;
-  }
-
-  registerEmail.classList.remove('error');
-  registerError.classList.add('hidden');
-  registerBtn.disabled = true;
-  registerBtn.textContent = '登録中...';
-
-  // Submit to Google Forms silently
-  const formData = new URLSearchParams();
-  formData.append(GFORM_EMAIL_FIELD, email);
-
-  fetch(GFORM_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: formData.toString()
-  }).then(() => {
-    // no-cors means we can't read the response, but submission works
-    localStorage.setItem(REGISTERED_KEY, email);
-    trackEvent('user_registered', { method: 'email' });
-    showScreen('welcome');
-  }).catch(() => {
-    // Even on network error, let user proceed (save locally)
-    localStorage.setItem(REGISTERED_KEY, email);
-    showScreen('welcome');
-  });
 }
 
 function handleStart() {
